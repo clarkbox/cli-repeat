@@ -17,13 +17,19 @@ if(!process.argv[2]){
 }
 
 function start(){
+    var self = this;
     var interval = program.interval * 1000,
-        delay = program.delay * 1000;
+        delay = program.delay * 1000,
+        timeout = new Date((new Date()).getTime() + program.timeout*1000 );
+    if(program.delay > program.timeout){
+        log('--timeout must be greater than --delay, otherwise your command will never run');
+        return;
+    }
     if(delay && program.verbose){
         log('Delaying start for '+ program.delay + ' seconds');
     }
-    setTimeout(function(){
-        setInterval(function(){
+    this._setTimeout = setTimeout(function(){
+        self._setInterval = setInterval(function(){
             if(program.verbose){
                 log('----REPEATING----');
             }
@@ -33,6 +39,12 @@ function start(){
                     log('----ERROR REPEATING----');
                     log(error);
                     log(stderr);
+                }
+
+                if((new Date()) > timeout){
+                    clearInterval(self._setTimeout);
+                    clearTimeout(self._setInterval);
+                    return false;
                 }
             });
         }, interval);

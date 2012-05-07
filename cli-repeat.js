@@ -17,38 +17,54 @@ if(!process.argv[2]){
 }
 
 function start(){
-    var self = this;
-    var interval = program.interval * 1000,
-        delay = program.delay * 1000,
-        timeout = new Date((new Date()).getTime() + program.timeout*1000 );
+    if(program.interval <= 0){
+        log('--internval must be greater than 0');
+        return;
+    }
     if(program.delay > program.timeout){
         log('--timeout must be greater than --delay, otherwise your command will never run');
         return;
     }
-    if(delay && program.verbose){
+
+    var self = this;
+    var interval = program.interval * 1000,
+        delay = program.delay * 1000;
+    this.i = 1;
+    this.timeout = new Date((new Date()).getTime() + program.timeout*1000);
+
+    if(program.delay && program.verbose){
         log('Delaying start for '+ program.delay + ' seconds');
     }
+
     this._setTimeout = setTimeout(function(){
+        exec(checkTimeout);
         self._setInterval = setInterval(function(){
             if(program.verbose){
-                log('----REPEATING----');
+                log('---- REPEATING '+ self.i++ +'----');
             }
-            proc.exec(program.command, function(error, stdout, stderr){
-                log(stdout);
-                if(error || stderr){
-                    log('----ERROR REPEATING----');
-                    log(error);
-                    log(stderr);
-                }
-
-                if((new Date()) > timeout){
-                    clearInterval(self._setTimeout);
-                    clearTimeout(self._setInterval);
-                    return false;
-                }
-            });
+            exec(checkTimeout);
         }, interval);
     }, delay);
+}
+
+function checkTimeout(){
+    if(program.timeout>0 && (new Date((new Date()).getTime() + program.interval*1000)) > timeout){
+        clearInterval(this._setTimeout);
+        clearTimeout(this._setInterval);
+        return;
+    }
+}
+
+function exec(callback){
+    proc.exec(program.command, function(error, stdout, stderr){
+        log(stdout);
+        if(error || stderr){
+            log('----ERROR REPEATING----');
+            log(error);
+            log(stderr);
+        }
+        callback();
+    });
 }
 
 function log(message){

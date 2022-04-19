@@ -15,7 +15,7 @@ This command will repeat "hello world" every 10 seconds for 60 seconds.
 cli-repeat.js --command "echo hello world" --interval 10 --timeout 60
 </pre>
 
-This command will repeat "hello world" once in 10 seconds. This is beacause the timeout will happen before a second iteration happens.
+This command will repeat "hello world" once in 10 seconds. This is beacause the timeout will happen before a second iteration happens...
 <pre>
 cli-repeat.js --command "echo hello world" --delay 10 --interval 10 --timeout 15
 </pre>

@@ -25,6 +25,10 @@ function start(){
         log('--timeout must be greater than --delay, otherwise your command will never run');
         return;
     }
+    if(!program.command){
+        log('--command not specified');
+        return;
+    }
 
     var self = this;
     var interval = program.interval * 1000,
